@@ -1,0 +1,23 @@
+import Link from "next/link"
+import Image from "next/image"
+import Navitems from "./Navitems"
+
+const Header = () => {
+  return (
+    <header className="sticky top-0 header">
+        <div className="container header-wrapper">
+                <Link href="/">
+                    <Image src="/assets/icons/logo.svg" alt="QuantSi" width={32} height={32} className="h-8 w-auto cursor-pointer"/>
+                </Link>
+            <nav className="hidden sm:block">
+                {/* NavItems */}
+                <Navitems />
+            </nav>
+            {/* UserDropdown */}
+        </div>
+      Header
+    </header>
+  )
+}
+
+export default Header
