@@ -1,6 +1,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import Navitems from "./Navitems"
+import UserDropdown from "./UserDropdown"
 
 const Header = () => {
   return (
@@ -13,7 +14,7 @@ const Header = () => {
                 {/* NavItems */}
                 <Navitems />
             </nav>
-            {/* UserDropdown */}
+            <UserDropdown />
         </div>
       Header
     </header>
