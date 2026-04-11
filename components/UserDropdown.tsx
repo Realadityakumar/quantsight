@@ -58,6 +58,7 @@ const UserDropdown = () => {
             Sign Out
           </DropdownMenuItem> 
           <DropdownMenuSeparator className="hidden sm:block bg-gray-600" />
+          {/* Displaying NavItems in Dropdown for mobile view */}
            <nav className="sm:hidden">
             <Navitems />
            </nav>
