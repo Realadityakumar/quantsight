@@ -3,7 +3,7 @@
 import { formatArticle, getDateRange, validateArticle } from "@/lib/utils";
 
  const FINNHUB_BASE_URL = "https://finnhub.io/api/v1";
- const NEXT_PUBLIC_FINNHUB_API_KEY = process.env.NEXT_PUBLIC_FINNHUB_API_KEY ?? "";
+ const FINNHUB_API_KEY = process.env.FINNHUB_API_KEY ?? "";
 
 const fetchJSON = async <T>(url: string, revalidateSeconds?: number): Promise<T> => {
   const response = await fetch(url, {
@@ -19,10 +19,10 @@ const fetchJSON = async <T>(url: string, revalidateSeconds?: number): Promise<T>
 };
 
 const buildCompanyNewsUrl = (symbol: string, from: string, to: string) =>
-  `${FINNHUB_BASE_URL}/company-news?symbol=${encodeURIComponent(symbol)}&from=${from}&to=${to}&token=${NEXT_PUBLIC_FINNHUB_API_KEY}`;
+  `${FINNHUB_BASE_URL}/company-news?symbol=${encodeURIComponent(symbol)}&from=${from}&to=${to}&token=${FINNHUB_API_KEY}`;
 
 const buildMarketNewsUrl = () =>
-  `${FINNHUB_BASE_URL}/news?category=general&token=${NEXT_PUBLIC_FINNHUB_API_KEY}`;
+  `${FINNHUB_BASE_URL}/news?category=general&token=${FINNHUB_API_KEY}`;
 
 const getGeneralNews = async (): Promise<MarketNewsArticle[]> => {
   const rawArticles = await fetchJSON<RawNewsArticle[]>(buildMarketNewsUrl());
@@ -42,7 +42,7 @@ const getGeneralNews = async (): Promise<MarketNewsArticle[]> => {
 
 export const getNews = async (symbols?: string[]): Promise<MarketNewsArticle[]> => {
   try {
-    if (!NEXT_PUBLIC_FINNHUB_API_KEY) {
+    if (!FINNHUB_API_KEY) {
       throw new Error("Finnhub API key is missing");
     }
 
@@ -57,22 +57,24 @@ export const getNews = async (symbols?: string[]): Promise<MarketNewsArticle[]> 
 
     const collected: MarketNewsArticle[] = [];
     const seenKeys = new Set<string>();
+    const uniqueSymbols = Array.from(new Set(cleanedSymbols));
 
-    for (let i = 0; i < 6; i += 1) {
-      const symbol = cleanedSymbols[i % cleanedSymbols.length];
+    for (const symbol of uniqueSymbols) {
       const url = buildCompanyNewsUrl(symbol, from, to);
       const articles = await fetchJSON<RawNewsArticle[]>(url);
-      const candidate = articles.find((article) => {
-        if (!validateArticle(article)) return false;
+
+      for (const article of articles) {
+        if (collected.length >= 6) break;
+        if (!validateArticle(article)) continue;
+
         const key = `${article.id}|${article.url}|${article.headline}`;
-        return !seenKeys.has(key);
-      });
+        if (!seenKeys.has(key)) {
+          seenKeys.add(key);
+          collected.push(formatArticle(article, true, symbol, collected.length));
+        }
+      }
 
-      if (!candidate) continue;
-
-      const key = `${candidate.id}|${candidate.url}|${candidate.headline}`;
-      seenKeys.add(key);
-      collected.push(formatArticle(candidate, true, symbol, i));
+      if (collected.length >= 6) break;
     }
 
     if (collected.length === 0) {

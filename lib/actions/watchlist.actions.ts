@@ -12,7 +12,7 @@ export const getWatchlistSymbolsByEmail = async (email: string): Promise<string[
     if (!db) throw new Error("Database connection is not available");
 
     const user = await db
-      .collection("users")
+      .collection("user")
       .findOne({ email });
 
     if (!user) return [];

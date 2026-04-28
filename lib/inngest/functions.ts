@@ -4,7 +4,7 @@ import { sendNewsSummaryEmail, sendWelcomeEmail } from "../nodemailler";
 import { getAllUsersForNewsEmail } from "../actions/user.actions";
 import { getWatchlistSymbolsByEmail } from "../actions/watchlist.actions";
 import { getNews } from "../actions/finnhub.actions";
-import { formatDateToday } from "../utils";
+import { getFormattedTodayDate } from "../utils";
 
 export const sendSignUpEmail = inngest.createFunction(
   {
@@ -95,7 +95,7 @@ export const sendDailyNewsSummary = inngest.createFunction(
 
     // Step #3: Summarize news via AI for each user (placeholder)
     
-    const userNewsSummaries: { user: User; newsContent: string | null }[] = [];
+    const userNewsSummaries: { user: NewsEmailUser; newsContent: string | null }[] = [];
 
     for(const { user, news } of userNews){
       try{
@@ -132,7 +132,7 @@ export const sendDailyNewsSummary = inngest.createFunction(
 
           return await sendNewsSummaryEmail({
             email: user.email,
-            date: formatDateToday,
+            date: getFormattedTodayDate(),
             newsContent
           })
         })
