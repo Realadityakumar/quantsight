@@ -6,10 +6,14 @@ import SelectField from "@/components/forms/SelectField"
 import { Button } from "@/components/ui/button"
 import { INVESTMENT_GOALS, PREFERRED_INDUSTRIES, RISK_TOLERANCE_OPTIONS } from "@/lib/constants"
 import { SubmitHandler, useForm } from "react-hook-form"
+import { signUpWithEmail } from "@/lib/actions/auth.actions"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 
 
 const SignUp = () => {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -32,11 +36,12 @@ const SignUp = () => {
 )
   const onSubmit: SubmitHandler<SignUpFormData> = async (data:SignUpFormData) =>{
     try{
-      console.log(data);
+      const result = await signUpWithEmail(data);
+      if(result.success) router.push('/');
     }catch(error){
       console.error("Error during sign-up:", error)
+      toast.error('Sign up failed', { description: error instanceof Error ? error.message : 'Failed to sign up. Please try again.' })
     }
-
   }
 
 
