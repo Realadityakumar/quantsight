@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { Command, CommandDialog, CommandEmpty, CommandInput, CommandList } from "@/components/ui/command"
 import {Button} from "@/components/ui/button";
 import {Loader2,  TrendingUp} from "lucide-react";
@@ -13,6 +13,7 @@ export default function SearchCommand({ renderAs = 'button', label = 'Add stock'
   const [searchTerm, setSearchTerm] = useState("")
   const [loading, setLoading] = useState(false)
   const [stocks, setStocks] = useState<StockWithWatchlistStatus[]>(initialStocks);
+  const latestRequestIdRef = useRef(0);
 
   const isSearchMode = !!searchTerm.trim();
   const displayStocks = isSearchMode ? stocks : stocks?.slice(0, 10);
@@ -29,14 +30,22 @@ export default function SearchCommand({ renderAs = 'button', label = 'Add stock'
   }, [])
 
   const handleSearch = async () => {
+    const requestId = ++latestRequestIdRef.current;
+    
     setLoading(true)
     try {
         const results = await searchStocks(searchTerm.trim());
-        setStocks(results);
+        if (requestId === latestRequestIdRef.current) {
+          setStocks(results);
+        }
     } catch {
-      setStocks([])
+      if (requestId === latestRequestIdRef.current) {
+        setStocks([])
+      }
     } finally {
-      setLoading(false)
+      if (requestId === latestRequestIdRef.current) {
+        setLoading(false)
+      }
     }
   }
 
@@ -85,7 +94,7 @@ export default function SearchCommand({ renderAs = 'button', label = 'Add stock'
                   {isSearchMode ? 'Search results' : 'Popular stocks'}
                   {` `}({displayStocks?.length || 0})
                 </div>
-                {displayStocks?.map((stock, i) => (
+                {displayStocks?.map((stock) => (
                     <li key={stock.symbol} className="search-item">
                       <Link
                           href={`/stocks/${stock.symbol}`}
