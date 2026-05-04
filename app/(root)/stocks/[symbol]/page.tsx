@@ -27,14 +27,14 @@ export default async function StockDetails({ params }: StockDetailsPageProps) {
           className="custom-chart h-auto min-h-42.5 w-full"
           height={170}
         />
-        
+        // Main Chart
         <TradingViewWidget
           scriptUrl={`${scriptUrl}advanced-chart.js`}
           config={CANDLE_CHART_WIDGET_CONFIG(decodedSymbol)}
           className="custom-chart w-full"
           height={600}
         />
-        
+        // Baseline Chart
         <TradingViewWidget
           scriptUrl={`${scriptUrl}advanced-chart.js`}
           config={BASELINE_WIDGET_CONFIG(decodedSymbol)}
@@ -42,7 +42,7 @@ export default async function StockDetails({ params }: StockDetailsPageProps) {
           height={600}
         />
       </div>
-
+    
       {/* Right Column */}
       <div className="xl:col-span-1 space-y-6 sm:space-y-8 flex flex-col">
         <WatchlistButton 
@@ -50,7 +50,7 @@ export default async function StockDetails({ params }: StockDetailsPageProps) {
           company={decodedSymbol} 
           isInWatchlist={false} 
         />
-
+        // Technical Analysis Widget
         <TradingViewWidget
           scriptUrl={`${scriptUrl}technical-analysis.js`}
           config={TECHNICAL_ANALYSIS_WIDGET_CONFIG(decodedSymbol)}
